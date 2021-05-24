@@ -56,14 +56,22 @@ str(All_Cities)
 
 # Data has 74 variables. Filter required variables.
 
-Filtered_All_Cities <- All_Cities %>% select(id, name, description, neighborhood_overview, host_id, host_name, host_since, 
-                                             host_about, host_response_time, host_response_rate, host_acceptance_rate, 
-                                             host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic, 
-                                             host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
-                                             property_type, room_type, accommodates, bathrooms_text, bedrooms, beds, amenities,
-                                             price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
-                                             has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
-                                             first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
+Filtered_All_Cities <- All_Cities %>% 
+  select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
+         host_about, host_response_time, host_response_rate, host_acceptance_rate,
+         host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
+         host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
+         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds, amenities,
+         price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
+         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
+         first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
+
+str(Filtered_All_Cities)
+
+# Convert City to factor 
+
+Filtered_All_Cities$City <- as.factor(Filtered_All_Cities$City)
+Filtered_All_Cities$City
 
 # Convert strings to numeric
 
@@ -109,27 +117,19 @@ Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "f"
 Filtered_All_Cities$instant_bookable <- as.numeric(Filtered_All_Cities$instant_bookable)
 Filtered_All_Cities$instant_bookable
 
-# Create only numeric data frame
+str(Filtered_All_Cities)
 
-Num_All_Cities <- Filtered_All_Cities %>% 
-  select(host_response_rate, host_acceptance_rate,host_is_superhost,host_listings_count, 
-         host_has_profile_pic,host_identity_verified, accommodates, bedrooms, beds,
-         price, minimum_nights, maximum_nights,has_availability, availability_30, 
-         availability_60, availability_90, availability_365, number_of_reviews, 
-         number_of_reviews_ltm, number_of_reviews_l30d, review_scores_rating, 
-         review_scores_accuracy, review_scores_cleanliness, review_scores_checkin, 
-         review_scores_communication,review_scores_location, review_scores_value, 
-         instant_bookable,reviews_per_month)
+#Dummy variables for cities
 
-# Summary statistics
+Filtered_All_Cities$Montreal <- ifelse(Filtered_All_Cities$City == "Montreal",1,0)
+Filtered_All_Cities$New_Brunswick <- ifelse(Filtered_All_Cities$City == "New Brunswick",1,0)
+Filtered_All_Cities$Ottawa <- ifelse(Filtered_All_Cities$City == "Ottawa",1,0)
+Filtered_All_Cities$Quebec_City <- ifelse(Filtered_All_Cities$City == "Quebec City",1,0)
+Filtered_All_Cities$Toronto <- ifelse(Filtered_All_Cities$City == "Toronto",1,0)
+Filtered_All_Cities$Vancouver <- ifelse(Filtered_All_Cities$City == "Vancouver",1,0)
+Filtered_All_Cities$Victoria <- ifelse(Filtered_All_Cities$City == "Victoria",1,0)
 
-summary(Num_All_Cities)
-
-pairs(Num_All_Cities)
-
-# Visualization
-
-OUTSTANDING
+str(Filtered_All_Cities)
 
 # Exploratory analysis
 
@@ -224,7 +224,156 @@ leaflet(Filtered_All_Cities) %>% addProviderTiles("CartoDB.DarkMatter") %>%
     popup = ~popup
   )
 
+# Univariate analysis
 
+summary(Filtered_All_Cities)
+
+# Price
+summary(Filtered_All_Cities$price) 
+hist(Filtered_All_Cities$price)
+
+# Response rate
+summary(Filtered_All_Cities$host_response_rate)
+hist(Filtered_All_Cities$host_response_rate)
+
+# Acceptance rate
+summary(Filtered_All_Cities$host_acceptance_rate)
+hist(Filtered_All_Cities$host_acceptance_rate)
+
+# Super host
+summary(Filtered_All_Cities$host_is_superhost)
+
+# Listings count
+summary(Filtered_All_Cities$host_listings_count)
+hist(Filtered_All_Cities$host_listings_count)
+
+# Profile pic
+summary(Filtered_All_Cities$host_has_profile_pic)
+hist(Filtered_All_Cities$host_has_profile_pic)
+
+# Identity verified
+summary(Filtered_All_Cities$host_identity_verified)
+
+# Accommodates
+summary(Filtered_All_Cities$accommodates)
+hist(Filtered_All_Cities$accommodates)
+
+# Bathrooms
+summary(Filtered_All_Cities$bathrooms)
+hist(Filtered_All_Cities$bathrooms)
+
+# Bedrooms
+summary(Filtered_All_Cities$bedrooms)
+hist(Filtered_All_Cities$bedrooms)
+
+# Beds
+summary(Filtered_All_Cities$beds)
+hist(Filtered_All_Cities$beds)
+
+# Price
+summary(Filtered_All_Cities$price)
+hist(Filtered_All_Cities$price)
+
+# Minimum nights
+summary(Filtered_All_Cities$minimum_nights)
+hist(Filtered_All_Cities$minimum_nights)
+
+# Maximum nights
+# Take note of city with 999,999,999 nights - SHOULD WE REMOVE?
+summary(Filtered_All_Cities$maximum_nights)
+hist(Filtered_All_Cities$maximum_nights)
+
+# Has availability
+summary(Filtered_All_Cities$has_availability)
+
+# Availability within 30 days
+summary(Filtered_All_Cities$availability_30)
+hist(Filtered_All_Cities$availability_30)
+
+# Number of reviews
+summary(Filtered_All_Cities$number_of_reviews)
+hist(Filtered_All_Cities$number_of_reviews)
+
+# Number of reviews last month
+summary(Filtered_All_Cities$number_of_reviews_ltm)
+hist(Filtered_All_Cities$number_of_reviews_ltm)
+
+# Number of reviews last 130 days
+summary(Filtered_All_Cities$number_of_reviews_l30d)
+hist(Filtered_All_Cities$number_of_reviews_l30d)
+
+# Review scores rating
+summary(Filtered_All_Cities$review_scores_rating)
+hist(Filtered_All_Cities$review_scores_rating)
+
+# Instant bookable 
+summary(Filtered_All_Cities$instant_bookable)
+
+# Reviews per month
+summary(Filtered_All_Cities$reviews_per_month)
+hist(Filtered_All_Cities$reviews_per_month)
+
+# City 
+summary(Filtered_All_Cities$City)
+
+
+
+###Montreal 
+Montreal_Full_List$description <- as.numeric(gsub("<br>", "", Montreal_Full_List$description ))
+Montreal_Full_List$description <- as.numeric(gsub("</b>", "", Montreal_Full_List$description ))
+Montreal_Full_List$description <- as.numeric(gsub("!", "", Montreal_Full_List$description ))
+
+Montreal_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Montreal_Full_List$neighborhood_overview ))
+Montreal_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Montreal_Full_List$neighborhood_overview ))
+
+###Quecbec
+Quesbec_Full_List$description <- as.numeric(gsub("<br>", "", Quecbec_Full_List$description ))
+Quecbec_Full_List$description <- as.numeric(gsub("</b>", "", Quecbec_Full_List$description ))
+Quecbec_Full_List$description <- as.numeric(gsub("!", "", Quecbec_Full_List$description ))
+
+Quecbec_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Quecbec_Full_List$neighborhood_overview ))
+Quecbec_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Quecbec_Full_List$neighborhood_overview ))
+
+###Toronto
+Toronto_Full_List$description <- as.numeric(gsub("<br>", "", Toronto_Full_List$description ))
+Toronto_Full_List$description <- as.numeric(gsub("</b>", "", Toronto_Full_List$description ))
+Toronto_Full_List$description <- as.numeric(gsub("!", "", Toronto_Full_List$description ))
+
+Toronto_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Toronto_Full_List$neighborhood_overview ))
+Toronto_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", TOronto_Full_List$neighborhood_overview ))
+
+###Ottawa
+Ottawa_Full_List$description <- as.numeric(gsub("<br>", "", Ottawa_Full_List$description ))
+Ottawa_Full_List$description <- as.numeric(gsub("</b>", "", Ottawa_Full_List$description ))
+Ottawa_Full_List$description <- as.numeric(gsub("!", "", Ottawa_Full_List$description ))
+
+Ottawa_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Ottawa_Full_List$neighborhood_overview ))
+Ottawa_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Ottawa_Full_List$neighborhood_overview ))
+
+###NewBrunsvic
+NewBrunsvic_Full_List$description <- as.numeric(gsub("<br>", "", NewBrunsvic_Full_List$description ))
+NewBrunsvic_Full_List$description <- as.numeric(gsub("</b>", "", NewBrunsvic_Full_List$description ))
+NewBrunsvic_Full_List$description <- as.numeric(gsub("!", "", NewBrunsvic_Full_List$description ))
+
+NewBrunsvic_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", NewBrunsvic_Full_List$neighborhood_overview ))
+NewBrunsvic_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", NewBrunsvic_Full_List$neighborhood_overview ))
+
+###Vancouver
+Vancouver_Full_List$description <- as.numeric(gsub("<br>", "", Vancouver_Full_List$description ))
+Vancouver_Full_List$description <- as.numeric(gsub("</b>", "", Vancouver_Full_List$description ))
+Vancouver_Full_List$description <- as.numeric(gsub("!", "", Vancouver_Full_List$description ))
+
+Vancouver_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Vancouver_Full_List$neighborhood_overview ))
+Vancouver_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Vancouver_Full_List$neighborhood_overview ))
+
+
+###Victoria
+Victoria_Full_List$description <- as.numeric(gsub("<br>", "", Victoria_Full_List$description ))
+Victoria_Full_List$description <- as.numeric(gsub("</b>", "", Victoria_Full_List$description ))
+Victoria_Full_List$description <- as.numeric(gsub("!", "", Victoria_Full_List$description ))
+
+Victoria_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Victoria_Full_List$neighborhood_overview ))
+Victoria_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Victoria_Full_List$neighborhood_overview ))
 
 
 
