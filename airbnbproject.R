@@ -145,7 +145,8 @@ str(Filtered_All_Cities)
 Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
 Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
 Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
-Filtered_All_Cities$neighborhood_overview <- gsub("br", "", Filtered_All_Cities$neighborhood_overview)
+Filtered_All_Cities$neighborhood_overview <- 
+  gsub("br", "", Filtered_All_Cities$neighborhood_overview)
 
 view(Filtered_All_Cities)
 
@@ -355,4 +356,16 @@ corr_data2
 pairs(corr_data2)
 
 corrplot(corr_data2)
+
+# Price by city
+
+city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price)) 
+            + stat_summary(fun = "mean", geom = "bar") 
+            + labs(x="City Name", y = "Average Price, $", 
+            title = "Average price comparison by city")
+
+city_price_graph
+
+
+
 
