@@ -23,6 +23,7 @@ library(mapsapi)
 library(mapview)
 library(sf)
 library(leaflet)
+library(corrplot)
 
 # Import data and assign to data frames
 
@@ -228,7 +229,7 @@ leaflet(data = Filtered_All_Cities) %>%  addProviderTiles("Stamen.Watercolor") %
                    color = ifelse(Filtered_All_Cities$price > 100, "red", "green"),
                    fillOpacity = 0.4)
 
-# Neighborhood visualization
+# Neighborhood visualization **** (Jessie - I would like to remove this)
 
 neighcolors <- colorFactor(topo.colors(25), Filtered_All_Cities$neighbourhood_cleansed)
 
@@ -332,6 +333,26 @@ hist(Filtered_All_Cities$reviews_per_month)
 # City 
 summary(Filtered_All_Cities$City)
 
+head(Filtered_All_Cities)
 
+# Correlation analysis
 
+corr_data <- Filtered_All_Cities  %>% 
+  select(host_response_rate, host_acceptance_rate,
+         host_is_superhost, host_listings_count, host_has_profile_pic,
+         host_identity_verified, accommodates, bedrooms, beds,
+         price, minimum_nights, maximum_nights,
+         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, 
+         number_of_reviews_l30d, review_scores_rating, instant_bookable, reviews_per_month, 
+         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
+         Toronto, Vancouver, Victoria)
+
+corr_data2 <- cor(corr_data, use = "complete.obs")
+corr_data2 <- round(corr_data2, 2)
+
+corr_data2
+
+pairs(corr_data2)
+
+corrplot(corr_data2)
 
