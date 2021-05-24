@@ -56,14 +56,17 @@ str(All_Cities)
 
 # Data has 74 variables. Filter required variables.
 
-Filtered_All_Cities <- All_Cities %>% select(id, name, description, neighborhood_overview, host_id, host_name, host_since, 
-                                             host_about, host_response_time, host_response_rate, host_acceptance_rate, 
-                                             host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic, 
-                                             host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
-                                             property_type, room_type, accommodates, bathrooms_text, bedrooms, beds, amenities,
-                                             price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
-                                             has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
-                                             first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
+Filtered_All_Cities <- All_Cities %>% 
+  select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
+         host_about, host_response_time, host_response_rate, host_acceptance_rate,
+         host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
+         host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
+         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds, amenities,
+         price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
+         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
+         first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
+
+str(Filtered_All_Cities)
 
 Filtered_All_Cities$City <- as.factor(Filtered_All_Cities$City)
 Filtered_All_Cities$City
@@ -112,17 +115,19 @@ Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "f"
 Filtered_All_Cities$instant_bookable <- as.numeric(Filtered_All_Cities$instant_bookable)
 Filtered_All_Cities$instant_bookable
 
+str(Filtered_All_Cities)
+
 # Create only numeric data frame
 
 Num_All_Cities <- Filtered_All_Cities %>% 
-  select(host_response_rate, host_acceptance_rate,host_is_superhost,host_listings_count, 
-         host_has_profile_pic,host_identity_verified, accommodates, bedrooms, beds,
-         price, minimum_nights, maximum_nights,has_availability, availability_30, 
-         availability_60, availability_90, availability_365, number_of_reviews, 
-         number_of_reviews_ltm, number_of_reviews_l30d, review_scores_rating, 
-         review_scores_accuracy, review_scores_cleanliness, review_scores_checkin, 
-         review_scores_communication,review_scores_location, review_scores_value, 
-         instant_bookable,reviews_per_month)
+  select(host_response_rate, host_acceptance_rate, 
+         host_is_superhost, host_listings_count, host_has_profile_pic, 
+         host_identity_verified, accommodates, bathrooms, bedrooms, beds,
+         price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, 
+         maximum_nights_avg_ntm,has_availability, availability_30, 
+         number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
+         first_review, last_review, review_scores_rating, instant_bookable, 
+         reviews_per_month)
 
 # Summary statistics
 
