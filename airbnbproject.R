@@ -331,3 +331,5 @@ hist(Filtered_All_Cities$reviews_per_month)
 summary(Filtered_All_Cities$City)
 
 
+
+
