@@ -66,6 +66,9 @@ Filtered_All_Cities <- All_Cities %>% select(id, name, description, neighborhood
                                              has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
                                              first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
 
+Filtered_All_Cities$City <- as.factor(Filtered_All_Cities$City)
+Filtered_All_Cities$City
+
 # Convert strings to numeric
 
 Filtered_All_Cities$host_response_rate <- 
@@ -132,8 +135,19 @@ pairs(Num_All_Cities)
 
 OUTSTANDING
 
-# Exploratory analysis
+#Dummy variables for cities
 
+Filtered_All_Cities$Montreal <- ifelse(Filtered_All_Cities$City == "Montreal",1,0)
+Filtered_All_Cities$New_Brunswick <- ifelse(Filtered_All_Cities$City == "New Brunswick",1,0)
+Filtered_All_Cities$Ottawa <- ifelse(Filtered_All_Cities$City == "Ottawa",1,0)
+Filtered_All_Cities$Quebec_City <- ifelse(Filtered_All_Cities$City == "Quebec City",1,0)
+Filtered_All_Cities$Toronto <- ifelse(Filtered_All_Cities$City == "Toronto",1,0)
+Filtered_All_Cities$Vancouver <- ifelse(Filtered_All_Cities$City == "Vancouver",1,0)
+Filtered_All_Cities$Victoria <- ifelse(Filtered_All_Cities$City == "Victoria",1,0)
+
+str(Filtered_All_Cities)
+
+# Exploratory analysis
 # Listing name
 
 airbnb_words <- Filtered_All_Cities %>%
