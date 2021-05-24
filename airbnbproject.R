@@ -141,9 +141,12 @@ str(Filtered_All_Cities)
 
 # Clean text <br>
 
-Filtered_All_Cities$description <- gsub("<br>", "", Filtered_All_Cities$description)
-Filtered_All_Cities$name <- gsub("<br>", "", Filtered_All_Cities$name)
-Filtered_All_Cities$host_about <- gsub("<br>", "", Filtered_All_Cities$host_about)
+Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
+Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
+Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
+Filtered_All_Cities$neighborhood_overview <- gsub("br", "", Filtered_All_Cities$neighborhood_overview)
+
+view(Filtered_All_Cities)
 
 # Exploratory analysis
 
@@ -293,7 +296,6 @@ summary(Filtered_All_Cities$minimum_nights)
 hist(Filtered_All_Cities$minimum_nights)
 
 # Maximum nights
-# Take note of city with 999,999,999 nights - SHOULD WE REMOVE?
 summary(Filtered_All_Cities$maximum_nights)
 hist(Filtered_All_Cities$maximum_nights)
 
