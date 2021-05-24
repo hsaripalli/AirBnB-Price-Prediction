@@ -54,6 +54,14 @@ All_Cities <- rbind(Montreal, New_Brunswick, Ottawa,
 view(All_Cities)
 str(All_Cities)
 
+# PASTE CLEANED DATA HERE **** AMOL + GBENGA 
+
+
+
+
+
+
+
 # Data has 74 variables. Filter required variables.
 
 Filtered_All_Cities <- All_Cities %>% 
