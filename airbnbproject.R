@@ -244,6 +244,17 @@ leaflet(Filtered_All_Cities) %>% addProviderTiles("CartoDB.DarkMatter") %>%
   )
 
 
+#Host is a superhost
+
+Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "t"] <- "True"
+Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "f"] <- "False"
+
+
+
+superhost <- ggplot(Filtered_All_Cities, aes(x = host_response_rate, y = review_scores_rating,
+                                          color = host_is_superhost, na.rm = FALSE)) + 
+  geom_point()
+superhost
 
 
 
