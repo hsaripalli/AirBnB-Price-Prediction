@@ -131,6 +131,12 @@ Filtered_All_Cities$Victoria <- ifelse(Filtered_All_Cities$City == "Victoria",1,
 
 str(Filtered_All_Cities)
 
+# Clean text <br>
+
+Filtered_All_Cities$description <- gsub("<br>", "", Filtered_All_Cities$description)
+Filtered_All_Cities$name <- gsub("<br>", "", Filtered_All_Cities$name)
+Filtered_All_Cities$host_about <- gsub("<br>", "", Filtered_All_Cities$host_about)
+
 # Exploratory analysis
 
 # Listing name
@@ -317,6 +323,7 @@ hist(Filtered_All_Cities$reviews_per_month)
 summary(Filtered_All_Cities$City)
 
 
+<<<<<<< HEAD
 
 ###Montreal 
 Montreal_Full_List$description <- as.numeric(gsub("<br>", "", Montreal_Full_List$description ))
@@ -376,3 +383,5 @@ Victoria_Full_List$description <- as.numeric(gsub("!", "", Victoria_Full_List$de
 
 
 
+=======
+>>>>>>> 25fd57e52d4ef2fce7da55682046ef97296cfb25
