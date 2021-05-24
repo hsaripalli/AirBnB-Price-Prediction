@@ -133,63 +133,9 @@ str(Filtered_All_Cities)
 
 # Clean text <br>
 
-###Montreal 
-Montreal$description <- as.numeric(gsub("<br>", "", Montreal$description ))
-Montreal_Full_List$description <- as.numeric(gsub("</b>", "", Montreal_Full_List$description ))
-Montreal_Full_List$description <- as.numeric(gsub("!", "", Montreal_Full_List$description ))
-
-Montreal_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Montreal_Full_List$neighborhood_overview ))
-Montreal_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Montreal_Full_List$neighborhood_overview ))
-
-###Quebec
-Quesbec_Full_List$description <- as.numeric(gsub("<br>", "", Quecbec_Full_List$description ))
-Quecbec_Full_List$description <- as.numeric(gsub("</b>", "", Quecbec_Full_List$description ))
-Quecbec_Full_List$description <- as.numeric(gsub("!", "", Quecbec_Full_List$description ))
-
-Quecbec_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Quecbec_Full_List$neighborhood_overview ))
-Quecbec_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Quecbec_Full_List$neighborhood_overview ))
-
-###Toronto
-Toronto_Full_List$description <- as.numeric(gsub("<br>", "", Toronto_Full_List$description ))
-Toronto_Full_List$description <- as.numeric(gsub("</b>", "", Toronto_Full_List$description ))
-Toronto_Full_List$description <- as.numeric(gsub("!", "", Toronto_Full_List$description ))
-
-Toronto_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Toronto_Full_List$neighborhood_overview ))
-Toronto_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", TOronto_Full_List$neighborhood_overview ))
-
-###Ottawa
-Ottawa_Full_List$description <- as.numeric(gsub("<br>", "", Ottawa_Full_List$description ))
-Ottawa_Full_List$description <- as.numeric(gsub("</b>", "", Ottawa_Full_List$description ))
-Ottawa_Full_List$description <- as.numeric(gsub("!", "", Ottawa_Full_List$description ))
-
-Ottawa_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Ottawa_Full_List$neighborhood_overview ))
-Ottawa_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Ottawa_Full_List$neighborhood_overview ))
-
-###NewBrunswick
-NewBrunsvic_Full_List$description <- as.numeric(gsub("<br>", "", NewBrunsvic_Full_List$description ))
-NewBrunsvic_Full_List$description <- as.numeric(gsub("</b>", "", NewBrunsvic_Full_List$description ))
-NewBrunsvic_Full_List$description <- as.numeric(gsub("!", "", NewBrunsvic_Full_List$description ))
-
-NewBrunsvic_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", NewBrunsvic_Full_List$neighborhood_overview ))
-NewBrunsvic_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", NewBrunsvic_Full_List$neighborhood_overview ))
-
-###Vancouver
-Vancouver_Full_List$description <- as.numeric(gsub("<br>", "", Vancouver_Full_List$description ))
-Vancouver_Full_List$description <- as.numeric(gsub("</b>", "", Vancouver_Full_List$description ))
-Vancouver_Full_List$description <- as.numeric(gsub("!", "", Vancouver_Full_List$description ))
-
-Vancouver_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Vancouver_Full_List$neighborhood_overview ))
-Vancouver_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Vancouver_Full_List$neighborhood_overview ))
-
-
-###Victoria
-Victoria_Full_List$description <- as.numeric(gsub("<br>", "", Victoria_Full_List$description ))
-Victoria_Full_List$description <- as.numeric(gsub("</b>", "", Victoria_Full_List$description ))
-Victoria_Full_List$description <- as.numeric(gsub("!", "", Victoria_Full_List$description ))
-
-Victoria_Full_List$neighborhood_overview <- as.numeric(gsub("<br>", "", Victoria_Full_List$neighborhood_overview ))
-Victoria_Full_List$neighborhood_overview <- as.numeric(gsub("</b>", "", Victoria_Full_List$neighborhood_overview ))
-
+Filtered_All_Cities$description <- gsub("<br>", "", Filtered_All_Cities$description)
+Filtered_All_Cities$name <- gsub("<br>", "", Filtered_All_Cities$name)
+Filtered_All_Cities$host_about <- gsub("<br>", "", Filtered_All_Cities$host_about)
 
 # Exploratory analysis
 
