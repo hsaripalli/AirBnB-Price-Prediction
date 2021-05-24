@@ -1,4 +1,3 @@
-#I'm here
 install.packages("wordcloud")
 install.packages("ggmap")
 install.packages("tm")
