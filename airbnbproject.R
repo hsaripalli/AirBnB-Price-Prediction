@@ -50,10 +50,7 @@ Victoria$City <- "Victoria"
 All_Cities <- rbind(Montreal, New_Brunswick, Ottawa, 
                     Quebec_City, Toronto, Vancouver, Victoria)
 
-# Inspect 
-
-view(All_Cities)
-str(All_Cities)
+All_Cities <- read_excel(file.choose())
 
 # PASTE CLEANED DATA HERE **** AMOL + GBENGA 
 
@@ -148,8 +145,6 @@ Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
 Filtered_All_Cities$neighborhood_overview <- 
   gsub("br", "", Filtered_All_Cities$neighborhood_overview)
 
-view(Filtered_All_Cities)
-
 # Exploratory analysis
 
 # Listing name
@@ -243,9 +238,31 @@ leaflet(Filtered_All_Cities) %>% addProviderTiles("CartoDB.DarkMatter") %>%
     popup = ~popup
   )
 
+
 # Univariate analysis
 
-summary(Filtered_All_Cities)
+# Correlation analysis
+
+corr_data <- Filtered_All_Cities  %>% 
+  select(host_response_rate, host_acceptance_rate,
+         host_is_superhost, host_listings_count, host_has_profile_pic,
+         host_identity_verified, accommodates, bedrooms, beds,
+         price, minimum_nights, maximum_nights,
+         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, 
+         number_of_reviews_l30d, review_scores_rating, instant_bookable, reviews_per_month, 
+         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
+         Toronto, Vancouver, Victoria)
+
+corr_data2 <- cor(corr_data, use = "complete.obs")
+corr_data2 <- round(corr_data2, 2)
+
+corr_data2
+
+pairs(corr_data2)
+
+corrplot(corr_data2)
+
+summary(corr_data)
 
 # Price
 summary(Filtered_All_Cities$price) 
@@ -336,36 +353,12 @@ summary(Filtered_All_Cities$City)
 
 head(Filtered_All_Cities)
 
-# Correlation analysis
-
-corr_data <- Filtered_All_Cities  %>% 
-  select(host_response_rate, host_acceptance_rate,
-         host_is_superhost, host_listings_count, host_has_profile_pic,
-         host_identity_verified, accommodates, bedrooms, beds,
-         price, minimum_nights, maximum_nights,
-         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, 
-         number_of_reviews_l30d, review_scores_rating, instant_bookable, reviews_per_month, 
-         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
-         Toronto, Vancouver, Victoria)
-
-corr_data2 <- cor(corr_data, use = "complete.obs")
-corr_data2 <- round(corr_data2, 2)
-
-corr_data2
-
-pairs(corr_data2)
-
-corrplot(corr_data2)
-
 # Price by city
 
 city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price)) 
-            + stat_summary(fun = "mean", geom = "bar") 
-            + labs(x="City Name", y = "Average Price, $", 
-            title = "Average price comparison by city")
++ stat_summary(fun = "mean", geom = "bar") 
++ labs(x="City Name", y = "Average Price, $", 
+       title = "Average price comparison by city")
 
 city_price_graph
-
-
-
 
