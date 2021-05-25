@@ -390,5 +390,34 @@ city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price))
 
 city_price_graph
 
+# Price by accommodates
 
+accommodates_graph <- ggplot(Filtered_All_Cities, aes(x= accommodates, y= price)) + 
+  stat_summary(fun = "mean", geom = "bar") + labs(x="Number of People Accommodated", 
+                                                  y = "Average Price, $", 
+       title = "Average price comparison by number of people accommodated in listing")
+accommodates_graph
 
+# Price by bedrooms
+
+price_bedrooms_graph <- ggplot(Filtered_All_Cities, aes(x= bedrooms, y= price)) + 
+  stat_summary(fun = "mean", geom = "bar") + 
+  labs(x="Number of Bedrooms", y = "Average Price, $",
+       title = "Average price comparison by number bedrooms")
+price_bedrooms_graph
+
+# Price by beds
+
+price_beds_graph <- ggplot(Filtered_All_Cities, aes(x= beds, y= price)) + 
+  stat_summary(fun = "mean", geom = "bar") + 
+  labs(x="Number of Beds", y = "Average Price, $",
+       title = "Average price comparison by number beds")
+price_beds_graph
+
+# Price by bathrooms
+
+price_bathrooms_graph <- ggplot(Filtered_All_Cities, aes(x= bathrooms, y= price)) + 
+  stat_summary(fun = "mean", geom = "bar") + 
+  labs(x="Number of Bathrooms", y = "Average Price, $",
+       title = "Average price comparison by number bathrooms")
+price_bathrooms_graph
