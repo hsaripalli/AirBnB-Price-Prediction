@@ -53,42 +53,16 @@ All_Cities <- rbind(Montreal, New_Brunswick, Ottawa,
 All_Cities <- read.csv(file.choose())
 
 # PASTE CLEANED DATA HERE **** AMOL + GBENGA 
-
-#MISSING DATA/IMPUTATION:
-install.packages("mice")
-install.packages("VIM")
-library(readxl)
-library(mice)
-library(VIM)
-md.pattern(Filtered_All_Cities, rotate.names = TRUE)
-Filtered_All_Cities$Missing <- md.pattern(Filtered_All_Cities,plot = FALSE, rotate.names = TRUE)
-
-head(Filtered_All_Cities)
-summary(Filtered_All_Cities)
-str(Filtered_All_Cities)
-dim(Filtered_All_Cities)   
-Mising <- data.frame(is.na(Filtered_All_Cities))
-# Now taking out all the blanks (missing values) in numeric columns:
-All_Cities_nonmissing <- na.omit(Filtered_All_Cities)
-md.pattern(All_Cities_nonmissing,rotate.names = TRUE)
-
-#Now changing N/A values to missing for character columns and then omitting them:
-
-All_Cities_nonmissingNA <- All_Cities_nonmissing%>%replace_with_na(replace = list(host_response_rate="N/A"))
-All_Cities_NA <- na.omit(All_Cities_nonmissingNA)
-
-
-
-
+# Moved from here to Line 144, before Exploratory Analysis for object name compatibility and flow
 
 # Data has 74 variables. Filter required variables.
 
 Filtered_All_Cities <- All_Cities %>% 
   select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
-         host_about, host_response_time, host_response_rate, host_acceptance_rate,
+         host_response_time, host_response_rate, host_acceptance_rate,
          host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
          host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
-         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds, amenities,
+         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds,
          price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
          has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
          first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
@@ -165,6 +139,32 @@ Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
 Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
 Filtered_All_Cities$neighborhood_overview <- 
   gsub("br", "", Filtered_All_Cities$neighborhood_overview)
+
+
+#MISSING DATA:
+install.packages("mice")
+install.packages("VIM")
+library(readxl)
+library(mice)
+library(VIM)
+md.pattern(Filtered_All_Cities, rotate.names = TRUE)
+Filtered_All_Cities$Missing <- md.pattern(Filtered_All_Cities,plot = FALSE, rotate.names = TRUE)
+
+head(Filtered_All_Cities)
+summary(Filtered_All_Cities)
+str(Filtered_All_Cities)
+dim(Filtered_All_Cities)   
+Mising <- data.frame(is.na(Filtered_All_Cities)) 
+
+# Now taking out all the blanks (missing values) in numeric columns:
+All_Cities_nonmissing <- na.omit(Filtered_All_Cities)
+md.pattern(All_Cities_nonmissing,rotate.names = TRUE)
+
+#Now changing N/A values to missing for character columns and then omitting them:
+
+All_Cities_nonmissingNA <- All_Cities_nonmissing%>%replace_with_na(replace = list(host_response_rate="N/A")) #ncode not running at my end 
+Filtered_All_Cities <- na.omit(All_Cities_nonmissingNA) #changed object name to align with subsequent naming
+n
 
 # Exploratory analysis
 
