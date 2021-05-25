@@ -54,7 +54,28 @@ All_Cities <- read.csv(file.choose())
 
 # PASTE CLEANED DATA HERE **** AMOL + GBENGA 
 
+#MISSING DATA/IMPUTATION:
+install.packages("mice")
+install.packages("VIM")
+library(readxl)
+library(mice)
+library(VIM)
+md.pattern(Filtered_All_Cities, rotate.names = TRUE)
+Filtered_All_Cities$Missing <- md.pattern(Filtered_All_Cities,plot = FALSE, rotate.names = TRUE)
 
+head(Filtered_All_Cities)
+summary(Filtered_All_Cities)
+str(Filtered_All_Cities)
+dim(Filtered_All_Cities)   
+Mising <- data.frame(is.na(Filtered_All_Cities))
+# Now taking out all the blanks (missing values) in numeric columns:
+All_Cities_nonmissing <- na.omit(Filtered_All_Cities)
+md.pattern(All_Cities_nonmissing,rotate.names = TRUE)
+
+#Now changing N/A values to missing for character columns and then omitting them:
+
+All_Cities_nonmissingNA <- All_Cities_nonmissing%>%replace_with_na(replace = list(host_response_rate="N/A"))
+All_Cities_NA <- na.omit(All_Cities_nonmissingNA)
 
 
 
