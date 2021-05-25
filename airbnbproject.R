@@ -50,7 +50,7 @@ Victoria$City <- "Victoria"
 All_Cities <- rbind(Montreal, New_Brunswick, Ottawa, 
                     Quebec_City, Toronto, Vancouver, Victoria)
 
-All_Cities <- read_excel(file.choose())
+All_Cities <- read.csv(file.choose())
 
 # PASTE CLEANED DATA HERE **** AMOL + GBENGA 
 
@@ -225,20 +225,6 @@ leaflet(data = Filtered_All_Cities) %>%  addProviderTiles("Stamen.Watercolor") %
                    color = ifelse(Filtered_All_Cities$price > 100, "red", "green"),
                    fillOpacity = 0.4)
 
-# Neighborhood visualization **** (Jessie - I would like to remove this)
-
-neighcolors <- colorFactor(topo.colors(25), Filtered_All_Cities$neighbourhood_cleansed)
-
-popup <- paste0("<strong>'hood: </strong>", Filtered_All_Cities$neighbourhood_cleansed)
-
-leaflet(Filtered_All_Cities) %>% addProviderTiles("CartoDB.DarkMatter") %>%
-  addCircleMarkers(
-    color = ~neighcolors(neighbourhood_cleansed),
-    stroke = FALSE, fillOpacity = 0.5, radius = 1.2,
-    popup = ~popup
-  )
-
-
 # Univariate analysis
 
 # Correlation analysis
@@ -249,8 +235,8 @@ corr_data <- Filtered_All_Cities  %>%
          host_identity_verified, accommodates, bedrooms, beds,
          price, minimum_nights, maximum_nights,
          has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, 
-         number_of_reviews_l30d, review_scores_rating, instant_bookable, reviews_per_month, 
-         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
+         number_of_reviews_l30d, review_scores_rating, instant_bookable, 
+         reviews_per_month,bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
          Toronto, Vancouver, Victoria)
 
 corr_data2 <- cor(corr_data, use = "complete.obs")
@@ -266,87 +252,129 @@ summary(corr_data)
 
 # Price
 summary(Filtered_All_Cities$price) 
-hist(Filtered_All_Cities$price)
+hist(Filtered_All_Cities$price, xlab="Price ($)", 
+     ylab="Number of listings", main = "Histogram of Price")
 
 # Response rate
 summary(Filtered_All_Cities$host_response_rate)
-hist(Filtered_All_Cities$host_response_rate)
+hist(Filtered_All_Cities$host_response_rate,
+     xlab="Host Response Rate, %", 
+     ylab="Number of listings", 
+     main = "Histogram of Host Response Rate")
 
 # Acceptance rate
 summary(Filtered_All_Cities$host_acceptance_rate)
-hist(Filtered_All_Cities$host_acceptance_rate)
+hist(Filtered_All_Cities$host_acceptance_rate, 
+     xlab="Host Acceptance Rate, %", 
+     ylab="Number of listings", 
+     main = "Histogram of Host Acceptance Rate")
 
 # Super host
 summary(Filtered_All_Cities$host_is_superhost)
 
 # Listings count
 summary(Filtered_All_Cities$host_listings_count)
-hist(Filtered_All_Cities$host_listings_count)
+hist(Filtered_All_Cities$host_listings_count,
+     xlab="Host Listings Count", 
+     ylab="Number of listings", 
+     main = "Histogram of Host Listings Count")
 
 # Profile pic
 summary(Filtered_All_Cities$host_has_profile_pic)
-hist(Filtered_All_Cities$host_has_profile_pic)
 
 # Identity verified
 summary(Filtered_All_Cities$host_identity_verified)
 
 # Accommodates
 summary(Filtered_All_Cities$accommodates)
-hist(Filtered_All_Cities$accommodates)
+hist(Filtered_All_Cities$accommodates,  
+     xlab="Number of People Accommodated", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of People Accommodated")
 
 # Bathrooms
 summary(Filtered_All_Cities$bathrooms)
-hist(Filtered_All_Cities$bathrooms)
+hist(Filtered_All_Cities$bathrooms,
+     xlab="Number of Bathrooms", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Bathrooms")
 
 # Bedrooms
 summary(Filtered_All_Cities$bedrooms)
-hist(Filtered_All_Cities$bedrooms)
+hist(Filtered_All_Cities$bedrooms,
+     xlab="Number of Bedrooms", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Bedrooms")
 
 # Beds
 summary(Filtered_All_Cities$beds)
-hist(Filtered_All_Cities$beds)
-
-# Price
-summary(Filtered_All_Cities$price)
-hist(Filtered_All_Cities$price)
+hist(Filtered_All_Cities$beds, 
+     xlab="Number of Beds", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Beds")
 
 # Minimum nights
 summary(Filtered_All_Cities$minimum_nights)
-hist(Filtered_All_Cities$minimum_nights)
+hist(Filtered_All_Cities$minimum_nights,
+     xlab="Minimum Number of Nights", 
+     ylab="Number of listings", 
+     main = "Histogram of Minimum Number of Nights")
+
 
 # Maximum nights
 summary(Filtered_All_Cities$maximum_nights)
-hist(Filtered_All_Cities$maximum_nights)
+hist(Filtered_All_Cities$maximum_nights,
+     xlab="Maximum Number of Nights", 
+     ylab="Number of listings", 
+     main = "Histogram of Maximum Number of Nights")
 
 # Has availability
 summary(Filtered_All_Cities$has_availability)
 
 # Availability within 30 days
 summary(Filtered_All_Cities$availability_30)
-hist(Filtered_All_Cities$availability_30)
+hist(Filtered_All_Cities$availability_30,
+     xlab="Number of Nights Available in Next 30 Days", 
+     ylab="Number of listings", 
+     main = "Histogram of Nights Available in Next 30 Days")
 
 # Number of reviews
 summary(Filtered_All_Cities$number_of_reviews)
-hist(Filtered_All_Cities$number_of_reviews)
+hist(Filtered_All_Cities$number_of_reviews,
+     xlab="Number of Reviews", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Reviews")
 
 # Number of reviews last month
 summary(Filtered_All_Cities$number_of_reviews_ltm)
-hist(Filtered_All_Cities$number_of_reviews_ltm)
+hist(Filtered_All_Cities$number_of_reviews_ltm,
+     xlab="Number of Reviews Last Month", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Reviews Last Month")
 
 # Number of reviews last 130 days
 summary(Filtered_All_Cities$number_of_reviews_l30d)
-hist(Filtered_All_Cities$number_of_reviews_l30d)
+hist(Filtered_All_Cities$number_of_reviews_l30d,
+     xlab="Number of Reviews Last 130 Days", 
+     ylab="Number of listings", 
+     main = "Histogram of Number of Reviews Last 130 Days")
 
 # Review scores rating
 summary(Filtered_All_Cities$review_scores_rating)
-hist(Filtered_All_Cities$review_scores_rating)
+hist(Filtered_All_Cities$review_scores_rating,
+     xlab="Rating", 
+     ylab="Number of listings", 
+     main = "Histogram of Reviews Rating")
 
 # Instant bookable 
 summary(Filtered_All_Cities$instant_bookable)
 
 # Reviews per month
 summary(Filtered_All_Cities$reviews_per_month)
-hist(Filtered_All_Cities$reviews_per_month)
+hist(Filtered_All_Cities$reviews_per_month,
+     xlab="Reviews Per Month", 
+     ylab="Number of listings", 
+     main = "Histogram of Reviews Per Month")
 
 # City 
 summary(Filtered_All_Cities$City)
@@ -361,4 +389,6 @@ city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price))
        title = "Average price comparison by city")
 
 city_price_graph
+
+
 
