@@ -24,6 +24,7 @@ library(mapview)
 library(sf)
 library(leaflet)
 library(corrplot)
+library(car)
 
 # Import data and assign to data frames
 
@@ -93,29 +94,29 @@ Filtered_All_Cities$bathrooms
 
 # Convert "t" and "f" observations binary
 
-Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "t"] <- 1
-Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "f"] <- 0
-Filtered_All_Cities$host_is_superhost <- as.numeric(Filtered_All_Cities$host_is_superhost)
+Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "t"] <- "True"
+Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "f"] <- "False"
+Filtered_All_Cities$host_is_superhost <- as.factor(Filtered_All_Cities$host_is_superhost)
 Filtered_All_Cities$host_is_superhost
 
-Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "t"] <- 1
-Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "f"] <- 0
-Filtered_All_Cities$host_has_profile_pic <- as.numeric(Filtered_All_Cities$host_has_profile_pic)
+Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "t"] <- "True"
+Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "f"] <- "False"
+Filtered_All_Cities$host_has_profile_pic <- as.factor(Filtered_All_Cities$host_has_profile_pic)
 Filtered_All_Cities$host_has_profile_pic
 
-Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "t"] <- 1
-Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "f"] <- 0
-Filtered_All_Cities$host_identity_verified <- as.numeric(Filtered_All_Cities$host_identity_verified) 
+Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "t"] <- "True"
+Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "f"] <- "False"
+Filtered_All_Cities$host_identity_verified <- as.factor(Filtered_All_Cities$host_identity_verified) 
 Filtered_All_Cities$host_identity_verified
 
-Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "t"] <- 1
-Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "f"] <- 0
-Filtered_All_Cities$has_availability <- as.numeric(Filtered_All_Cities$has_availability)
+Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "t"] <- "True"
+Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "f"] <- "False"
+Filtered_All_Cities$has_availability <- as.factor(Filtered_All_Cities$has_availability)
 Filtered_All_Cities$has_availability
 
-Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "t"] <- 1
-Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "f"] <- 0
-Filtered_All_Cities$instant_bookable <- as.numeric(Filtered_All_Cities$instant_bookable)
+Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "t"] <- "True"
+Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "f"] <- "False"
+Filtered_All_Cities$instant_bookable <- as.factor(Filtered_All_Cities$instant_bookable)
 Filtered_All_Cities$instant_bookable
 
 str(Filtered_All_Cities)
@@ -130,13 +131,19 @@ Filtered_All_Cities$Toronto <- ifelse(Filtered_All_Cities$City == "Toronto",1,0)
 Filtered_All_Cities$Vancouver <- ifelse(Filtered_All_Cities$City == "Vancouver",1,0)
 Filtered_All_Cities$Victoria <- ifelse(Filtered_All_Cities$City == "Victoria",1,0)
 
+
+
+
 str(Filtered_All_Cities)
 
 # Clean text <br>
 
 Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
 Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
-Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
+
+# host_about column not present in filtered df
+#Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
+
 Filtered_All_Cities$neighborhood_overview <- 
   gsub("br", "", Filtered_All_Cities$neighborhood_overview)
 
@@ -150,11 +157,13 @@ library(VIM)
 md.pattern(Filtered_All_Cities, rotate.names = TRUE)
 Filtered_All_Cities$Missing <- md.pattern(Filtered_All_Cities,plot = FALSE, rotate.names = TRUE)
 
+sum(is.na(Filtered_All_Cities$host_id))
+
 head(Filtered_All_Cities)
 summary(Filtered_All_Cities)
 str(Filtered_All_Cities)
 dim(Filtered_All_Cities)   
-Mising <- data.frame(is.na(Filtered_All_Cities)) 
+Missing <- data.frame(is.na(Filtered_All_Cities)) 
 
 # Now taking out all the blanks (missing values) in numeric columns:
 All_Cities_nonmissing <- na.omit(Filtered_All_Cities)
@@ -162,8 +171,9 @@ md.pattern(All_Cities_nonmissing,rotate.names = TRUE)
 
 #Now changing N/A values to missing for character columns and then omitting them:
 
-All_Cities_nonmissingNA <- All_Cities_nonmissing%>%replace_with_na(replace = list(host_response_rate="N/A")) #ncode not running at my end 
-Filtered_All_Cities <- na.omit(All_Cities_nonmissingNA) #changed object name to align with subsequent naming
+All_Cities_nonmissingNA <- All_Cities_nonmissing%>%
+  replace_with_na(replace = list(host_response_rate="N/A")) #ncode not running at my end 
+Filtered_All_Cities1 <- na.omit(All_Cities_nonmissingNA) #changed object name to align with subsequent naming
 n
 
 # Exploratory analysis
@@ -248,47 +258,25 @@ leaflet(data = Filtered_All_Cities) %>%  addProviderTiles("Stamen.Watercolor") %
 
 # Univariate analysis
 
-# Correlation analysis
-
-corr_data <- Filtered_All_Cities  %>% 
-  select(host_response_rate, host_acceptance_rate,
-         host_is_superhost, host_listings_count, host_has_profile_pic,
-         host_identity_verified, accommodates, bedrooms, beds,
-         price, minimum_nights, maximum_nights,
-         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, 
-         number_of_reviews_l30d, review_scores_rating, instant_bookable, 
-         reviews_per_month,bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, 
-         Toronto, Vancouver, Victoria)
-
-corr_data2 <- cor(corr_data, use = "complete.obs")
-corr_data2 <- round(corr_data2, 2)
-
-corr_data2
-
-pairs(corr_data2)
-
-corrplot(corr_data2)
-
-summary(corr_data)
 
 # Price
 summary(Filtered_All_Cities$price) 
 hist(Filtered_All_Cities$price, xlab="Price ($)", 
-     ylab="Number of listings", main = "Histogram of Price")
+     ylab="Number of listings", main = "Histogram of Price", na.rm = TRUE)
 
 # Response rate
 summary(Filtered_All_Cities$host_response_rate)
 hist(Filtered_All_Cities$host_response_rate,
      xlab="Host Response Rate, %", 
      ylab="Number of listings", 
-     main = "Histogram of Host Response Rate")
+     main = "Histogram of Host Response Rate", na.rom = TRUE)
 
 # Acceptance rate
 summary(Filtered_All_Cities$host_acceptance_rate)
 hist(Filtered_All_Cities$host_acceptance_rate, 
      xlab="Host Acceptance Rate, %", 
      ylab="Number of listings", 
-     main = "Histogram of Host Acceptance Rate")
+     main = "Histogram of Host Acceptance Rate", na.rm = TRUE)
 
 # Super host
 summary(Filtered_All_Cities$host_is_superhost)
@@ -298,7 +286,7 @@ summary(Filtered_All_Cities$host_listings_count)
 hist(Filtered_All_Cities$host_listings_count,
      xlab="Host Listings Count", 
      ylab="Number of listings", 
-     main = "Histogram of Host Listings Count")
+     main = "Histogram of Host Listings Count", na.RM = TRUE)
 
 # Profile pic
 summary(Filtered_All_Cities$host_has_profile_pic)
@@ -311,7 +299,7 @@ summary(Filtered_All_Cities$accommodates)
 hist(Filtered_All_Cities$accommodates,  
      xlab="Number of People Accommodated", 
      ylab="Number of listings", 
-     main = "Histogram of Number of People Accommodated")
+     main = "Histogram of Number of People Accommodated", na.rm = TRUE)
 
 # Bathrooms
 summary(Filtered_All_Cities$bathrooms)
@@ -325,14 +313,14 @@ summary(Filtered_All_Cities$bedrooms)
 hist(Filtered_All_Cities$bedrooms,
      xlab="Number of Bedrooms", 
      ylab="Number of listings", 
-     main = "Histogram of Number of Bedrooms")
+     main = "Histogram of Number of Bedrooms", na.rm = TRUE)
 
 # Beds
 summary(Filtered_All_Cities$beds)
 hist(Filtered_All_Cities$beds, 
      xlab="Number of Beds", 
      ylab="Number of listings", 
-     main = "Histogram of Number of Beds")
+     main = "Histogram of Number of Beds", na.rm = TRUE)
 
 # Minimum nights
 summary(Filtered_All_Cities$minimum_nights)
@@ -347,7 +335,7 @@ summary(Filtered_All_Cities$maximum_nights)
 hist(Filtered_All_Cities$maximum_nights,
      xlab="Maximum Number of Nights", 
      ylab="Number of listings", 
-     main = "Histogram of Maximum Number of Nights")
+     main = "Histogram of Maximum Number of Nights", na.rm = TRUE)
 
 # Has availability
 summary(Filtered_All_Cities$has_availability)
@@ -404,9 +392,11 @@ head(Filtered_All_Cities)
 
 # Price by city
 
-city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price)) 
-+ stat_summary(fun = "mean", geom = "bar") 
-+ labs(x="City Name", y = "Average Price, $", 
+summary(Filtered_All_Cities$price)
+
+city_price_graph <- ggplot(Filtered_All_Cities, aes(x= City, y= price)) + 
+  stat_summary(fun = "mean", geom = "bar") +
+  labs(x="City Name", y = "Average Price, $", 
        title = "Average price comparison by city")
 
 city_price_graph
@@ -442,3 +432,50 @@ price_bathrooms_graph <- ggplot(Filtered_All_Cities, aes(x= bathrooms, y= price)
   labs(x="Number of Bathrooms", y = "Average Price, $",
        title = "Average price comparison by number bathrooms")
 price_bathrooms_graph
+
+
+# Correlation analysis and linear regression
+
+
+Filtered_All_Cities <- All_Cities %>% 
+  select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
+         host_response_time, host_response_rate, host_acceptance_rate,
+         host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
+         host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
+         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds,
+         price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
+         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
+         first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
+
+# Dummy variables for instant booking
+
+Filtered_All_Cities$instant_book_true <- ifelse(Filtered_All_Cities$instant_bookable == "True", 1, 0)
+Filtered_All_Cities$instant_book_false <- ifelse(Filtered_All_Cities$instant_bookable == "False", 1, 0)
+
+# Filter variables to include in the model
+
+corr_data <- Filtered_All_Cities  %>% 
+  select(accommodates, bedrooms, 
+         price,number_of_reviews_ltm,review_scores_rating, instant_book_true, 
+         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, Vancouver, Victoria,
+         Toronto)
+
+#Inspect NAs and omit NAs
+md.pattern(corr_data, rotate.names = TRUE)
+corr_data2 <- na.omit(corr_data)
+md.pattern(corr_data2, rotate.names = TRUE)
+
+sample <- sample.int(n=nrow(corr_data2), size = floor(.7*nrow(corr_data2)), replace = F)
+train <- data[sample,]
+test <- data[-sample,]
+
+reg <- lm(price ~ ., train)
+pred <- predict(reg, test)
+
+
+summary(reg)
+plot(reg)
+
+plot(density(resid(reg)))
+
+ncvTest(reg)
