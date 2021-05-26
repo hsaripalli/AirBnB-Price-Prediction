@@ -181,7 +181,7 @@ Filtered_All_Cities1 <- na.omit(All_Cities_nonmissingNA) #changed object name to
 n
 
 #################################################################################################################
-# SECTION 3: EXPLORATORY ANALYSIS
+# SECTION 3: EXPLORATORY DATA ANALYSIS (EDA)
 
 
 
@@ -450,7 +450,8 @@ price_bathrooms_graph
 
 corr_data <- Filtered_All_Cities  %>% 
   select(accommodates, bedrooms, 
-         price, number_of_reviews_ltm, review_scores_rating, instant_bookable, bathrooms, City, room_type)
+         price, number_of_reviews_ltm, review_scores_rating, instant_bookable,
+         bathrooms, City, room_type)
 
 # Create dummy variables
 
@@ -473,6 +474,8 @@ corr_data2 <- na.omit(corr_data)
 md.pattern(corr_data2, rotate.names = TRUE)
 
 #After TTT approach on corr_data df, select final variables that belong in the model
+# If we need to include any new variables, add it to corr_data, remove NAs using corr_data2, then select it 
+# in the model df. 
 
 model <- corr_data2  %>% 
   select(accommodates, bedrooms, price, 
@@ -492,7 +495,7 @@ pred <- predict(reg, test)
 
 summary(reg)
 
-#Regression plots dont look ideal
+#Regression plots don't look ideal
 plot(reg)
 
 #Density plot looks perfectly normal
@@ -505,4 +508,75 @@ ncvTest(reg)
 data.frame(R2 = R2(pred, test$price),
            RMSE = RMSE(pred, test$price),
            MAE = MAE(pred, test$price))
+
+################################################################################################################
+
+# SECTION 5: OCCUPANCY RATES
+
+
+#Create a df for occupancy
+
+occupancy <- Filtered_All_Cities  %>% 
+  select(accommodates, bedrooms, neighbourhood_cleansed,host_is_superhost,
+         price, minimum_nights, City, room_type, number_of_reviews, reviews_per_month,
+         review_scores_rating, host_response_rate)
+
+#Omit NAs
+occupancy$host_is_superhost[occupancy$host_is_superhost == ""] <-NA
+
+occupancy <- na.omit(occupancy)
+
+# Create an occupancy days column. Using minimum nights and a conservative estimate of 50% review reporting
+# Occupancy days capped at 30 nights per month
+occupancy$occupancy_days <- occupancy$reviews_per_month*2*occupancy$minimum_nights
+occupancy$occupancy_days <- ifelse(occupancy$occupancy_days < 30, 
+                                               occupancy$occupancy_days, 30)
+occupancy$occupancy_rate <- (occupancy$occupancy_days)/30
+
+
+
+#Calculate revenue = price per night x occupancy rate
+occupancy$revenue <- occupancy$occupancy_days*occupancy$price
+
+
+# Monthly revenue by city 
+revenue <- ggplot(occupancy, aes(x = City, y = revenue)) + 
+  geom_bar(stat = 'summary', fun = 'mean') +
+  labs(x = "City", y = "Avg Monthly Revenue, $", title = "Average monthly revenue by city" )
+revenue
+
+# Occupancy Rates by city
+occupancy_rates <- ggplot(occupancy, aes(x = City, y = occupancy_rate)) + 
+  geom_bar(stat = 'summary', fun = 'mean') + 
+  scale_y_continuous(labels = scales ::percent) + 
+  labs(x = "City", y = "Average Monthly Occupancy Rate", title = "Monthly occupancy rate by city" )
+occupancy_rates
+
+#Occupancy rates for superhost
+occupancy_superhost <- ggplot(occupancy, 
+                 aes(x = City, y = occupancy_rate, fill = host_is_superhost)) + 
+  geom_bar(stat = 'summary', fun = 'mean', position = "dodge") + 
+  labs(x = "City", y = "Occupancy Rate, %" , title = "Occupancy Rates for Superhosts" )
+occupancy_superhost
+
+#Average Price for listing
+price_superhost <- ggplot(occupancy, 
+                            aes(x = City, y = price, fill = host_is_superhost)) + 
+  geom_bar(stat = 'summary', fun = 'mean', position = "dodge") + 
+  labs(x = "City", y = "Average Listing Price, $", title = "Average listing price by CIty")
+price_superhost
+
+# Average Monthly revenue
+revenue_superhost <- ggplot(occupancy, 
+                              aes(x = City, y = revenue, fill = host_is_superhost)) + 
+  geom_bar(stat = 'summary', fun = 'mean', position = "dodge")
+revenue_superhost
+
+#Who is a superhost
+superhost <- ggplot(occupancy, aes(x = host_response_rate, y = review_scores_rating,
+                                          color = host_is_superhost)) + 
+  geom_point() + 
+  labs(x = "Host response rate", y = "Review scores rating", title = "Superhost")
+superhost
+
 
