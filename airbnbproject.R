@@ -8,6 +8,7 @@ install.packages("sf")
 install.packages("crossplot")
 install.packages("mice")
 install.packages("VIM")
+install.packages("ggpubr")
 
 # Load libraries
 
@@ -30,6 +31,7 @@ library(car)
 library(mice)
 library(VIM)
 library(caret)
+library(ggpubr)
 
 # Import data and assign to data frames
 
@@ -542,15 +544,19 @@ occupancy$revenue <- occupancy$occupancy_days*occupancy$price
 # Monthly revenue by city 
 revenue <- ggplot(occupancy, aes(x = City, y = revenue)) + 
   geom_bar(stat = 'summary', fun = 'mean') +
-  labs(x = "City", y = "Avg Monthly Revenue, $", title = "Average monthly revenue by city" )
+  labs(x = "City", y = "Monthly Revenue, $", title = "Average monthly revenue by city" )
 revenue
 
 # Occupancy Rates by city
 occupancy_rates <- ggplot(occupancy, aes(x = City, y = occupancy_rate)) + 
   geom_bar(stat = 'summary', fun = 'mean') + 
   scale_y_continuous(labels = scales ::percent) + 
-  labs(x = "City", y = "Average Monthly Occupancy Rate", title = "Monthly occupancy rate by city" )
+  labs(x = "City", y = "Monthly Occupancy Rate", title = "Monthly occupancy rate by city" )
 occupancy_rates
+
+
+figure1 <- ggarrange(revenue, occupancy_rates, nrow = 2)
+figure1
 
 #Occupancy rates for superhost
 occupancy_superhost <- ggplot(occupancy, 
@@ -563,20 +569,28 @@ occupancy_superhost
 price_superhost <- ggplot(occupancy, 
                             aes(x = City, y = price, fill = host_is_superhost)) + 
   geom_bar(stat = 'summary', fun = 'mean', position = "dodge") + 
-  labs(x = "City", y = "Average Listing Price, $", title = "Average listing price by CIty")
+  labs(x = "City", y = "Listing Price, $", title = "Average Listing price by City")
 price_superhost
 
 # Average Monthly revenue
 revenue_superhost <- ggplot(occupancy, 
                               aes(x = City, y = revenue, fill = host_is_superhost)) + 
-  geom_bar(stat = 'summary', fun = 'mean', position = "dodge")
+  geom_bar(stat = 'summary', fun = 'mean', position = "dodge") + 
+  labs(x = "City", y = "Monthly Revenue, $", title = "Average Monthly revenue by city")
 revenue_superhost
+
+figure2 <- ggarrange(occupancy_superhost,
+                     price_superhost,
+                     revenue_superhost,
+                     nrow = 3)
+figure2
+
 
 #Who is a superhost
 superhost <- ggplot(occupancy, aes(x = host_response_rate, y = review_scores_rating,
                                           color = host_is_superhost)) + 
   geom_point() + 
-  labs(x = "Host response rate", y = "Review scores rating", title = "Superhost")
+  labs(x = "Host response rate", y = "Review scores rating", title = "Who is a Superhost")
 superhost
 
 
