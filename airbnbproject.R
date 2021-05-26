@@ -6,6 +6,8 @@ install.packages("mapsapi")
 install.packages("mapview")
 install.packages("sf")
 install.packages("crossplot")
+install.packages("mice")
+install.packages("VIM")
 
 # Load libraries
 
@@ -25,8 +27,13 @@ library(sf)
 library(leaflet)
 library(corrplot)
 library(car)
+library(mice)
+library(VIM)
+library(caret)
 
 # Import data and assign to data frames
+
+
 
 Montreal <- read.csv(file.choose())
 New_Brunswick <- read.csv(file.choose())
@@ -70,10 +77,20 @@ Filtered_All_Cities <- All_Cities %>%
 
 str(Filtered_All_Cities)
 
+############################################################################################################
+
+# Section 1: CLEAN DATA
+
+
+
 # Convert City to factor 
 
 Filtered_All_Cities$City <- as.factor(Filtered_All_Cities$City)
 Filtered_All_Cities$City
+
+#Convert room type to factor
+
+Filtered_All_Cities$room_type <- as.factor(Filtered_All_Cities$room_type)
 
 # Convert strings to numeric
 
@@ -92,60 +109,47 @@ Filtered_All_Cities$bathrooms <-
   as.numeric(gsub(".*?([0-9]+).*", "\\1", Filtered_All_Cities$bathrooms_text))
 Filtered_All_Cities$bathrooms
 
-# Convert "t" and "f" observations binary
+# Convert "t" and "f" observations as True or False
 
 Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "t"] <- "True"
 Filtered_All_Cities$host_is_superhost[Filtered_All_Cities$host_is_superhost == "f"] <- "False"
 Filtered_All_Cities$host_is_superhost <- as.factor(Filtered_All_Cities$host_is_superhost)
-Filtered_All_Cities$host_is_superhost
+
 
 Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "t"] <- "True"
 Filtered_All_Cities$host_has_profile_pic[Filtered_All_Cities$host_has_profile_pic == "f"] <- "False"
 Filtered_All_Cities$host_has_profile_pic <- as.factor(Filtered_All_Cities$host_has_profile_pic)
-Filtered_All_Cities$host_has_profile_pic
+
 
 Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "t"] <- "True"
 Filtered_All_Cities$host_identity_verified[Filtered_All_Cities$host_identity_verified == "f"] <- "False"
 Filtered_All_Cities$host_identity_verified <- as.factor(Filtered_All_Cities$host_identity_verified) 
-Filtered_All_Cities$host_identity_verified
+
 
 Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "t"] <- "True"
 Filtered_All_Cities$has_availability[Filtered_All_Cities$has_availability == "f"] <- "False"
 Filtered_All_Cities$has_availability <- as.factor(Filtered_All_Cities$has_availability)
-Filtered_All_Cities$has_availability
+
 
 Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "t"] <- "True"
 Filtered_All_Cities$instant_bookable[Filtered_All_Cities$instant_bookable == "f"] <- "False"
 Filtered_All_Cities$instant_bookable <- as.factor(Filtered_All_Cities$instant_bookable)
-Filtered_All_Cities$instant_bookable
-
-str(Filtered_All_Cities)
-
-#Dummy variables for cities
-
-Filtered_All_Cities$Montreal <- ifelse(Filtered_All_Cities$City == "Montreal",1,0)
-Filtered_All_Cities$New_Brunswick <- ifelse(Filtered_All_Cities$City == "New Brunswick",1,0)
-Filtered_All_Cities$Ottawa <- ifelse(Filtered_All_Cities$City == "Ottawa",1,0)
-Filtered_All_Cities$Quebec_City <- ifelse(Filtered_All_Cities$City == "Quebec City",1,0)
-Filtered_All_Cities$Toronto <- ifelse(Filtered_All_Cities$City == "Toronto",1,0)
-Filtered_All_Cities$Vancouver <- ifelse(Filtered_All_Cities$City == "Vancouver",1,0)
-Filtered_All_Cities$Victoria <- ifelse(Filtered_All_Cities$City == "Victoria",1,0)
-
-
-
-
-str(Filtered_All_Cities)
 
 # Clean text <br>
 
 Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
 Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
 
-# host_about column not present in filtered df
+## host_about column not present in filtered df.
 #Filtered_All_Cities$host_about <- gsub("br", "", Filtered_All_Cities$host_about)
 
 Filtered_All_Cities$neighborhood_overview <- 
   gsub("br", "", Filtered_All_Cities$neighborhood_overview)
+
+#################################################################################################################
+
+# SECTION 2: MISSING DATA
+
 
 
 #MISSING DATA:
@@ -176,7 +180,10 @@ All_Cities_nonmissingNA <- All_Cities_nonmissing%>%
 Filtered_All_Cities1 <- na.omit(All_Cities_nonmissingNA) #changed object name to align with subsequent naming
 n
 
-# Exploratory analysis
+#################################################################################################################
+# SECTION 3: EXPLORATORY ANALYSIS
+
+
 
 # Listing name
 
@@ -433,49 +440,69 @@ price_bathrooms_graph <- ggplot(Filtered_All_Cities, aes(x= bathrooms, y= price)
        title = "Average price comparison by number bathrooms")
 price_bathrooms_graph
 
+################################################################################################
 
-# Correlation analysis and linear regression
+# SECTION 4: LINEAR REGRESSION AND HYPOTHESIS TESTING
 
 
-Filtered_All_Cities <- All_Cities %>% 
-  select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
-         host_response_time, host_response_rate, host_acceptance_rate,
-         host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
-         host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
-         property_type, room_type, accommodates, bathrooms_text, bedrooms, beds,
-         price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm,
-         has_availability, availability_30, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d,
-         first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
 
-# Dummy variables for instant booking
-
-Filtered_All_Cities$instant_book_true <- ifelse(Filtered_All_Cities$instant_bookable == "True", 1, 0)
-Filtered_All_Cities$instant_book_false <- ifelse(Filtered_All_Cities$instant_bookable == "False", 1, 0)
-
-# Filter variables to include in the model
+# Initial filter for variables to include in the model
 
 corr_data <- Filtered_All_Cities  %>% 
   select(accommodates, bedrooms, 
-         price,number_of_reviews_ltm,review_scores_rating, instant_book_true, 
-         bathrooms, Montreal, New_Brunswick, Ottawa, Quebec_City, Vancouver, Victoria,
-         Toronto)
+         price, number_of_reviews_ltm, review_scores_rating, instant_bookable, bathrooms, City, room_type)
 
-#Inspect NAs and omit NAs
-md.pattern(corr_data, rotate.names = TRUE)
+# Create dummy variables
+
+corr_data$Montreal <- ifelse(corr_data$City == "Montreal",1,0)
+corr_data$New_Brunswick <- ifelse(corr_data$City == "New Brunswick",1,0)
+corr_data$Ottawa <- ifelse(corr_data$City == "Ottawa",1,0)
+corr_data$Quebec_City <- ifelse(corr_data$City == "Quebec City",1,0)
+corr_data$Toronto <- ifelse(corr_data$City == "Toronto",1,0)
+corr_data$Vancouver <- ifelse(corr_data$City == "Vancouver",1,0)
+corr_data$Victoria <- ifelse(corr_data$City == "Victoria",1,0)
+corr_data$hotel_room <- ifelse(corr_data$room_type == "Hotel room",1,0)
+corr_data$private_room <- ifelse(corr_data$room_type == "Private room",1,0)
+corr_data$shared_room <- ifelse(corr_data$room_type == "Shared room",1,0)
+corr_data$instant_book_true <- ifelse(corr_data$instant_bookable == "True", 1, 0)
+corr_data$instant_book_false <- ifelse(corr_data$instant_bookable == "False", 1, 0)
+
+#Inspect and omit NAs for the model
+md.pattern(corr_data, )
 corr_data2 <- na.omit(corr_data)
 md.pattern(corr_data2, rotate.names = TRUE)
 
-sample <- sample.int(n=nrow(corr_data2), size = floor(.7*nrow(corr_data2)), replace = F)
-train <- data[sample,]
-test <- data[-sample,]
+#After TTT approach on corr_data df, select final variables that belong in the model
 
+model <- corr_data2  %>% 
+  select(accommodates, bedrooms, price, 
+         number_of_reviews_ltm, review_scores_rating, 
+         bathrooms, private_room, shared_room,
+         Victoria, Vancouver, Toronto)
+
+# Split 70-30 test and train
+
+sample <- sample.int(n=nrow(model), size = floor(.7*nrow(model)), replace = F)
+train <- model[sample,]
+test <- model[-sample,]
+
+#linear model and summary plots
 reg <- lm(price ~ ., train)
 pred <- predict(reg, test)
 
-
 summary(reg)
+
+#Regression plots dont look ideal
 plot(reg)
 
+#Density plot looks perfectly normal
 plot(density(resid(reg)))
 
+#Data is homoskedastic
 ncvTest(reg)
+
+#Compare R2 and RMSE. They are about the same which tells that the model is good and not over fitted
+data.frame(R2 = R2(pred, test$price),
+           RMSE = RMSE(pred, test$price),
+           MAE = MAE(pred, test$price))
+
