@@ -32,6 +32,7 @@ library(mice)
 library(VIM)
 library(caret)
 library(ggpubr)
+library(scales)
 
 # Import data and assign to data frames
 
@@ -62,6 +63,24 @@ All_Cities <- rbind(Montreal, New_Brunswick, Ottawa,
 
 All_Cities <- read.csv(file.choose())
 
+reviews_Montreal <- read.csv(file.choose())
+reviews_New_Brunswick <- read.csv(file.choose())
+reviews_Ottawa <- read.csv(file.choose())
+reviews_Quebec_City <- read.csv(file.choose())
+reviews_Toronto <- read.csv(file.choose())
+reviews_Vancouver <- read.csv(file.choose())
+reviews_Victoria <- read.csv(file.choose())
+
+all_reviews <- rbind(reviews_Montreal,
+                     reviews_New_Brunswick, 
+                     reviews_Ottawa,
+                     reviews_Quebec_City,
+                     reviews_Toronto,
+                     reviews_Vancouver,
+                     reviews_Victoria)
+
+write.csv(all_reviews, "C:\\hS\\LearnR\\airbnbteamproject\\all_reviews.csv")
+
 # PASTE CLEANED DATA HERE **** AMOL + GBENGA 
 # Moved from here to Line 144, before Exploratory Analysis for object name compatibility and flow
 
@@ -78,6 +97,8 @@ Filtered_All_Cities <- All_Cities %>%
          first_review, last_review, review_scores_rating, instant_bookable, reviews_per_month, City)
 
 str(Filtered_All_Cities)
+
+
 
 ############################################################################################################
 
@@ -186,6 +207,20 @@ n
 # SECTION 3: EXPLORATORY DATA ANALYSIS (EDA)
 
 
+str(all_reviews)
+all_reviews <- na.omit(all_reviews)
+all_reviews$date <- as.Date(all_reviews$date)
+
+
+num_reviews <- all_reviews %>%
+  group_by(date = all_reviews$date) %>%
+  summarise(number = n())
+num_reviews
+
+ggplot(num_reviews, aes(x = date, y = number)) + 
+  geom_point(na.rm = TRUE, alpha = 0.5, color = "steelblue") + 
+  geom_smooth(color = "black") + 
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y")
 
 # Listing name
 
@@ -477,7 +512,7 @@ md.pattern(corr_data2, rotate.names = TRUE)
 
 #After TTT approach on corr_data df, select final variables that belong in the model
 # If we need to include any new variables, add it to corr_data, remove NAs using corr_data2, then select it 
-# in the model df. 
+# in the "model" df. 
 
 model <- corr_data2  %>% 
   select(accommodates, bedrooms, price, 
@@ -540,6 +575,22 @@ occupancy$occupancy_rate <- (occupancy$occupancy_days)/30
 #Calculate revenue = price per night x occupancy rate
 occupancy$revenue <- occupancy$occupancy_days*occupancy$price
 
+plot1 <- ggplot(occupancy, aes(x = occupancy_rate, y = revenue)) + 
+  geom_point(alpha = 0.5, color = "steel blue") +
+  geom_smooth(color = "black") + 
+  labs(x = "Occupancy Rate", y = "Monthly Revenue, $", title = "Monthly revenue versus Occupancy Rate Correlation",
+       subtitle = "Good correlation") + 
+  scale_y_continuous(limits = c(0,5000,500))
+plot1
+
+plot2 <- ggplot(occupancy, aes(x = price, y = revenue)) + 
+  geom_point(alpha = 0.5, color = "steel blue") +
+  geom_smooth(color = "black") + 
+  labs(x = "Price, $", y = "Monthly Revenue, $", title = "Monthly revenue versus Price Correlation", 
+       subtitle = "Not a strong correlation" ) + 
+  scale_y_continuous(limits = c(0,5000,500))
+plot2
+
 
 # Monthly revenue by city 
 revenue <- ggplot(occupancy, aes(x = City, y = revenue)) + 
@@ -592,5 +643,33 @@ superhost <- ggplot(occupancy, aes(x = host_response_rate, y = review_scores_rat
   geom_point() + 
   labs(x = "Host response rate", y = "Review scores rating", title = "Who is a Superhost")
 superhost
+
+#Calculate mean revenue per city
+
+Rev_Toronto <- mean(occupancy$revenue[occupancy$City == "Toronto"])
+Rev_Vancouver <- mean(occupancy$revenue[occupancy$City == "Vancouver"])
+Rev_Victoria <- mean(occupancy$revenue[occupancy$City == "Victoria"])
+Rev_Quebec_City <- mean(occupancy$revenue[occupancy$City == "Quebec City"])
+Rev_Ottawa <- mean(occupancy$revenue[occupancy$City == "Ottawa"])
+Rev_New_Brunswick <- mean(occupancy$revenue[occupancy$City == "New Brunswick"])
+Rev_Montreal <- mean(occupancy$revenue[occupancy$City == "Montreal"])
+
+Rev_Toronto 
+Rev_Vancouver
+Rev_Victoria
+Rev_Quebec_City
+Rev_Ottawa
+Rev_New_Brunswick
+Rev_Montreal
+
+#Import rentals data into a dataframe
+
+compare <- read_excel(file.choose())
+
+rent_or_list <- ggplot(compare, 
+                       aes(x = City, y = Price, fill = Type)) + 
+  geom_bar(stat = 'summary', fun = 'mean', position = "dodge") + 
+  labs(x = "City", y = "Expected Monthly Revenue, $", title = "Monthly revenue by Rent versus Airbnb")
+rent_or_list
 
 
