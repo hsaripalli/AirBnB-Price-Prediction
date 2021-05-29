@@ -465,6 +465,28 @@ price_bathrooms_graph <- ggplot(Filtered_All_Cities, aes(x= bathrooms, y= price)
        title = "Average price comparison by number bathrooms")
 price_bathrooms_graph
 
+# Correlation analysis 
+corr_data <- Filtered_All_Cities %>% 
+  select(host_response_rate, host_accaptance_rate, host_is_superhost,
+         host_listings_count, host_has_profile_pic, host_identity_verified,
+         accommodates, bedrooms, beds, price, minimum_nights, maximum_nights,
+         has_availability, availability_30, number_of_reviews, 
+         number_of_reviews_ltm, number_of_reviews_l30d, review_scores_rating,
+         instant_bookable, reviews_per_month, bathrooms, Montreal,
+         New_Brunswick, Ottawa, Quebec_City, Toronto, Vancouver, Victoria)
+
+corr_data2 <- cor(corr_data, use =  "complete.obs")
+corr_data2 <- round(corr_data2, 2)
+
+corr_data2
+
+pairs(corr_data2)
+
+corrplot(corr_data2)
+
+summary(corr_data2)
+
+
 ################################################################################################
 
 # SECTION 4: LINEAR REGRESSION AND HYPOTHESIS TESTING
