@@ -81,8 +81,6 @@ all_reviews <- rbind(reviews_Montreal,
 
 write.csv(all_reviews, "C:\\hS\\LearnR\\airbnbteamproject\\all_reviews.csv")
 
-# PASTE CLEANED DATA HERE **** AMOL + GBENGA 
-# Moved from here to Line 144, before Exploratory Analysis for object name compatibility and flow
 
 # Data has 74 variables. Filter required variables.
 
