@@ -36,8 +36,6 @@ library(scales)
 
 # Import data and assign to data frames
 
-
-
 Montreal <- read.csv(file.choose())
 New_Brunswick <- read.csv(file.choose())
 Ottawa <- read.csv(file.choose())
@@ -82,10 +80,10 @@ all_reviews <- rbind(reviews_Montreal,
 write.csv(all_reviews, "C:\\hS\\LearnR\\airbnbteamproject\\all_reviews.csv")
 
 
-# Data has 74 variables. Filter required variables.
+# Filter required variables.
 
 Filtered_All_Cities <- All_Cities %>% 
-  select(id, name, description, neighborhood_overview, host_id, host_name, host_since,
+  select(id, name, neighborhood_overview, host_id, host_name, host_since,
          host_response_time, host_response_rate, host_acceptance_rate,
          host_is_superhost, host_neighbourhood, host_listings_count, host_has_profile_pic,
          host_identity_verified, neighbourhood_cleansed, latitude, longitude, 
@@ -97,12 +95,9 @@ Filtered_All_Cities <- All_Cities %>%
 str(Filtered_All_Cities)
 
 
-
 ############################################################################################################
 
 # Section 1: CLEAN DATA
-
-
 
 # Convert City to factor 
 
@@ -158,7 +153,7 @@ Filtered_All_Cities$instant_bookable <- as.factor(Filtered_All_Cities$instant_bo
 
 # Clean text <br>
 
-Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
+#Filtered_All_Cities$description <- gsub("br", "", Filtered_All_Cities$description)
 Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
 
 ## host_about column not present in filtered df.
@@ -167,20 +162,15 @@ Filtered_All_Cities$name <- gsub("br", "", Filtered_All_Cities$name)
 Filtered_All_Cities$neighborhood_overview <- 
   gsub("br", "", Filtered_All_Cities$neighborhood_overview)
 
+str(Filtered_All_Cities)
+
 #################################################################################################################
 
 # SECTION 2: MISSING DATA
 
-
-
 #MISSING DATA:
-install.packages("mice")
-install.packages("VIM")
-library(readxl)
-library(mice)
-library(VIM)
+
 md.pattern(Filtered_All_Cities, rotate.names = TRUE)
-Filtered_All_Cities$Missing <- md.pattern(Filtered_All_Cities,plot = FALSE, rotate.names = TRUE)
 
 sum(is.na(Filtered_All_Cities$host_id))
 
@@ -188,6 +178,7 @@ head(Filtered_All_Cities)
 summary(Filtered_All_Cities)
 str(Filtered_All_Cities)
 dim(Filtered_All_Cities)   
+
 Missing <- data.frame(is.na(Filtered_All_Cities)) 
 
 # Now taking out all the blanks (missing values) in numeric columns:
@@ -203,7 +194,6 @@ n
 
 #################################################################################################################
 # SECTION 3: EXPLORATORY DATA ANALYSIS (EDA)
-
 
 str(all_reviews)
 all_reviews <- na.omit(all_reviews)
@@ -479,8 +469,6 @@ price_bathrooms_graph
 
 # SECTION 4: LINEAR REGRESSION AND HYPOTHESIS TESTING
 
-
-
 # Initial filter for variables to include in the model
 
 corr_data <- Filtered_All_Cities  %>% 
@@ -488,6 +476,7 @@ corr_data <- Filtered_All_Cities  %>%
          price, number_of_reviews_ltm, review_scores_rating, instant_bookable,
          bathrooms, City, room_type)
 
+str(corr_data)
 # Create dummy variables
 
 corr_data$Montreal <- ifelse(corr_data$City == "Montreal",1,0)
@@ -525,6 +514,7 @@ train <- model[sample,]
 test <- model[-sample,]
 
 #linear model and summary plots
+
 reg <- lm(price ~ ., train)
 pred <- predict(reg, test)
 
@@ -533,7 +523,7 @@ summary(reg)
 #Regression plots don't look ideal
 plot(reg)
 
-#Density plot looks perfectly normal
+#Density plot looks normal
 plot(density(resid(reg)))
 
 #Data is homoskedastic
@@ -543,6 +533,52 @@ ncvTest(reg)
 data.frame(R2 = R2(pred, test$price),
            RMSE = RMSE(pred, test$price),
            MAE = MAE(pred, test$price))
+
+#Create variables to capture potential nonlinear relationships
+
+corr_data2$bedrooms_squared <- corr_data2$bedrooms^2
+corr_data2$bathrooms_squared <- corr_data2$bathrooms^2
+corr_data2$bedrooms_ln <- log(corr_data2$bedrooms)
+corr_data2$bathrooms_ln<- log(corr_data2$bathrooms)
+str(corr_data2)
+
+# Model2
+
+model2 <- corr_data2  %>% 
+  select(accommodates, bedrooms, price, 
+         number_of_reviews_ltm, review_scores_rating, 
+         bathrooms, private_room, shared_room,
+         Victoria, Vancouver, Toronto, bedrooms_squared, bathrooms_squared)
+
+# Split 70-30 test and train
+
+sample2 <- sample.int(n=nrow(model2), size = floor(.7*nrow(model2)), replace = F)
+train2 <- model2[sample,]
+test2 <- model2[-sample,]
+
+#linear model and summary plots
+
+reg2 <- lm(price ~ ., train2)
+pred2 <- predict(reg, test2)
+
+summary(reg2)
+
+#check if "number_of_reviews_ltm" and "review_scores_rating" only are jointly 0, and that there's no collinearity problem
+linearHypothesis(reg2, c("bedrooms_squared=0", "bathrooms_squared=0"))
+
+#Regression plots don't look ideal
+plot(reg2)
+
+#Density plot looks normal
+plot(density(resid(reg2)))
+
+#Data is homoskedastic
+ncvTest(reg2)
+
+#Compare R2 and RMSE. They are about the same which tells that the model is good and not over fitted
+data.frame(R2 = R2(pred2, test$price),
+           RMSE = RMSE(pred2, test$price),
+           MAE = MAE(pred2, test$price))
 
 ################################################################################################################
 
@@ -567,7 +603,6 @@ occupancy$occupancy_days <- occupancy$reviews_per_month*2*occupancy$minimum_nigh
 occupancy$occupancy_days <- ifelse(occupancy$occupancy_days < 30, 
                                                occupancy$occupancy_days, 30)
 occupancy$occupancy_rate <- (occupancy$occupancy_days)/30
-
 
 
 #Calculate revenue = price per night x occupancy rate
