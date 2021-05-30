@@ -188,9 +188,8 @@ md.pattern(All_Cities_nonmissing,rotate.names = TRUE)
 #Now changing N/A values to missing for character columns and then omitting them:
 
 All_Cities_nonmissingNA <- All_Cities_nonmissing%>%
-  replace_with_na(replace = list(host_response_rate="N/A")) #ncode not running at my end 
-Filtered_All_Cities1 <- na.omit(All_Cities_nonmissingNA) #changed object name to align with subsequent naming
-n
+  replace_with_na(replace = list(host_response_rate="N/A")) 
+Filtered_All_Cities1 <- na.omit(All_Cities_nonmissingNA) 
 
 #################################################################################################################
 # SECTION 3: EXPLORATORY DATA ANALYSIS (EDA)
